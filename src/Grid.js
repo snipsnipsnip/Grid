@@ -54,8 +54,6 @@
 			onLoad : this.nothing, 
 			supportMultipleGridsInView : false, 
 			fixedCols : 0, 
-			selectedBgColor : "#eaf1f7", 
-			fixedSelectedBgColor : "#dce7f0", 
 			colAlign : [], // "left", "center", "right"
 			colBGColors : [], 
 			colSortTypes : [], // "string", "number", "date", "custom", "none"
@@ -880,21 +878,18 @@
 	//////////////////////////////////////////////////////////////////////////////////
 	GridProto.highlightRows = function(toSelect, toRemove) {
 		var nodes = [this.bodyFixed2.children, this.bodyStatic.children], 
-		    fixedSelBgColor = this.options.fixedSelectedBgColor, 
-		    selBgColor = this.options.selectedBgColor, 
 		    fixedCols = this.options.fixedCols, 
 		    colIdx = this.columns, 
-		    bgColor, rows, inputs, i;
+		    rows, inputs, i;
 		
 		while (colIdx) {
 			rows = (((--colIdx) < fixedCols) ? nodes[0] : nodes[1])[colIdx].children;
-			bgColor = (colIdx < fixedCols) ? fixedSelBgColor : selBgColor;
 			
 			i = toRemove.length;
-			while (i) { rows[toRemove[--i]].style.backgroundColor = ""; }
+			while (i) { removeClass(rows[toRemove[--i]], 'g_Selected'); }
 			
 			i = toSelect.length;
-			while (i) { rows[toSelect[--i]].style.backgroundColor = bgColor; }
+			while (i) { addClass(rows[toSelect[--i]], 'g_Selected'); }
 		}
 		if (this.options.showSelectionColumn) {
 			inputs = nodes[(!this.usesTouch) ? 0 : 1][0].getElementsByTagName("INPUT");
@@ -1057,6 +1052,18 @@
 	    slice = Array.prototype.slice, 
 	    msie = getIEVersion();
 	
+	var addClass, removeClass;
+	if ("classList" in document.createElement("a")) {
+	  addClass = function(elem, className) { elem.classList.add(className); };
+	  removeClass = function(elem, className) { elem.classList.remove(className); };
+	} else {
+	  addClass = function(elem, className) { elem.className += ' ' + className; };
+	  removeClass = function(elem, className) {
+	    var before = elem.className;
+	    var after = before.replace(RegExp('\\b' + className + '\\b'), '');
+	    if (before !== after) { elem.className = after; }
+	  };
+	}
 	// Expose:
 	window.Grid = Grid;
 	

@@ -79,6 +79,12 @@
 	left : 0px;
 	overflow : hidden;
 }
+.g_Selected {
+  background-color: #eaf1f7;
+}
+.g_BodyFixed .g_Selected {
+  background-color: #dce7f0;
+}
 .g_BodyFixed {
 	/* Base body fixed container if fixedCols > 0 */
 	position : absolute;
