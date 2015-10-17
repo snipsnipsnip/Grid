@@ -191,6 +191,11 @@ value and the column index being sorted on. You may want to use this option, for
 comparisons.  
 Default is `null`.
 
+**wheelSpeed**
+Integer. Multiplier of delta-Y on mouse wheel emulation (otherwise the fixed columns can't be scrolled).
+Default is `44`.
+
+
 Future Features
 ---------------
 
