@@ -193,7 +193,7 @@ Default is `null`.
 
 **wheelSpeed**
 Integer. Multiplier of delta-Y on mouse wheel emulation (otherwise the fixed columns can't be scrolled).
-Default is `44`.
+Default is `33`.
 
 
 Future Features
