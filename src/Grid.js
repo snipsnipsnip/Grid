@@ -55,7 +55,6 @@
 			supportMultipleGridsInView : false, 
 			fixedCols : 0, 
 			colAlign : [], // "left", "center", "right"
-			colBGColors : [], 
 			colSortTypes : [], // "string", "number", "date", "custom", "none"
 			customSortCleaner : null
 		};
@@ -279,7 +278,6 @@
 		var html, rows, i;
 		
 		if (this.options.showSelectionColumn) {
-			this.options.colBGColors.unshift(this.options.colBGColors[0] || "");
 			this.options.colSortTypes.unshift("none");
 			this.options.colAlign.unshift("left");
 			if (!this.usesTouch) {
@@ -414,7 +412,6 @@
 		var sNodes = [this.headStatic.children || [], this.bodyStatic.children || [], this.footStatic.children || []], 
 		    fNodes = [this.headFixed.children || [], this.bodyFixed2.children || [], this.footFixed.children || []], 
 		    allowColumnResize = this.options.allowColumnResize, 
-		    colBGColors = this.options.colBGColors, 
 		    colAlign = this.options.colAlign, 
 		    fixedCols = this.options.fixedCols, 
 		    rules = this.css.rules, 
@@ -440,9 +437,6 @@
 			
 			this.columnWidths[i] = colWidth;
 			rules[".g_Cl" + i] = { "width" : colWidth + "px", "text-align" : (colAlign[i] || "left") };
-			if ((colBGColors[i] || "#ffffff") !== "#ffffff") {
-				rules[".g_Cl" + i]["background-color"] = colBGColors[i];
-			}
 			if (allowColumnResize) {
 				rules[".g_RS" + i] = { "margin-left" : (colWidth - 2) + "px" };
 			}
@@ -462,7 +456,6 @@
 		                 "y" : this.body.offsetHeight - this.body.clientHeight };
 		
 		rules[".g_C"] = { "visibility" : "visible" };
-		rules[".g_Cl"] = { "background-color" : "#fff" };
 		rules[".g_BodyStatic"] = { "padding" : headHeight + "px 0px " + footHeight + "px 0px" };
 		if (this.hasHead) {
 			rules[".g_Head"] = { "right" : sBarSize.x + "px" };
