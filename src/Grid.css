@@ -79,7 +79,7 @@
 	left : 0px;
 	overflow : hidden;
 }
-.g_Selected {
+.g_BR.g_Selected {
   background-color: #eaf1f7;
 }
 .g_BodyFixed .g_Selected {
