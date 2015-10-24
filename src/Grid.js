@@ -54,6 +54,7 @@
 			onLoad : this.nothing, 
 			supportMultipleGridsInView : false, 
 			fixedCols : 0, 
+			wheelSpeed : 33,
 			selectedBgColor : "#eaf1f7", 
 			fixedSelectedBgColor : "#dce7f0", 
 			colAlign : [], // "left", "center", "right"
@@ -520,7 +521,7 @@
 			deltaY = event.detail;
 		}
 		
-		this.body.scrollTop += (deltaY * 33);
+		this.body.scrollTop += deltaY * this.options.wheelSpeed;
 		this.syncScrolls();
 	};
 	
