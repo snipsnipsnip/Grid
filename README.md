@@ -158,25 +158,10 @@ Integer. The number of columns to fix starting from the leftmost column. If `sho
 automatically increment by 1. Disabled automatically in touch devices.  
 Default is `0`.
 
-**selectedBgColor**  
-String. The color value to set as the background color for selected rows. `allowSelections` must be `true` for this option to be 
-used.  
-Default is `"#eaf1f7"`.
-
-**fixedSelectedBgColor**  
-String. The color value to set as the background color for selected, fixed rows. `allowSelections` must be `true` and `fixedCols` > 0 
-for this option to be used.  
-Default is `"#dce7f0"`.
-
 **colAlign**  
 Array. An array of strings specifying column text alignment. `colAlign[0]` specifies the 1st column's text alignment, and so forth. 
 Accepted array values are `"left"`, `"center"` and `"right"`.  
 Default is `"left"` for every column.
-
-**colBGColors**  
-Array. An array of strings specifying column background color. `colBGColors[0]` specifies the 1st column's background color, and so 
-forth.  
-Default is `"#ffffff"` for every column.
 
 **colSortTypes**  
 Array. An array of string specifying column sort types. `colSortTypes[0]` specifies the 1st column's sort type, and so forth. 

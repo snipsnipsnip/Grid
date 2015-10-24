@@ -55,10 +55,7 @@
 			supportMultipleGridsInView : false, 
 			fixedCols : 0, 
 			wheelSpeed : 33,
-			selectedBgColor : "#eaf1f7", 
-			fixedSelectedBgColor : "#dce7f0", 
 			colAlign : [], // "left", "center", "right"
-			colBGColors : [], 
 			colSortTypes : [], // "string", "number", "date", "custom", "none"
 			customSortCleaner : null
 		};
@@ -282,7 +279,6 @@
 		var html, rows, i;
 		
 		if (this.options.showSelectionColumn) {
-			this.options.colBGColors.unshift(this.options.colBGColors[0] || "");
 			this.options.colSortTypes.unshift("none");
 			this.options.colAlign.unshift("left");
 			if (!this.usesTouch) {
@@ -417,7 +413,6 @@
 		var sNodes = [this.headStatic.children || [], this.bodyStatic.children || [], this.footStatic.children || []], 
 		    fNodes = [this.headFixed.children || [], this.bodyFixed2.children || [], this.footFixed.children || []], 
 		    allowColumnResize = this.options.allowColumnResize, 
-		    colBGColors = this.options.colBGColors, 
 		    colAlign = this.options.colAlign, 
 		    fixedCols = this.options.fixedCols, 
 		    rules = this.css.rules, 
@@ -443,9 +438,6 @@
 			
 			this.columnWidths[i] = colWidth;
 			rules[".g_Cl" + i] = { "width" : colWidth + "px", "text-align" : (colAlign[i] || "left") };
-			if ((colBGColors[i] || "#ffffff") !== "#ffffff") {
-				rules[".g_Cl" + i]["background-color"] = colBGColors[i];
-			}
 			if (allowColumnResize) {
 				rules[".g_RS" + i] = { "margin-left" : (colWidth - 2) + "px" };
 			}
@@ -465,7 +457,6 @@
 		                 "y" : this.body.offsetHeight - this.body.clientHeight };
 		
 		rules[".g_C"] = { "visibility" : "visible" };
-		rules[".g_Cl"] = { "background-color" : "#fff" };
 		rules[".g_BodyStatic"] = { "padding" : headHeight + "px 0px " + footHeight + "px 0px" };
 		if (this.hasHead) {
 			rules[".g_Head"] = { "right" : sBarSize.x + "px" };
@@ -881,21 +872,18 @@
 	//////////////////////////////////////////////////////////////////////////////////
 	GridProto.highlightRows = function(toSelect, toRemove) {
 		var nodes = [this.bodyFixed2.children, this.bodyStatic.children], 
-		    fixedSelBgColor = this.options.fixedSelectedBgColor, 
-		    selBgColor = this.options.selectedBgColor, 
 		    fixedCols = this.options.fixedCols, 
 		    colIdx = this.columns, 
-		    bgColor, rows, inputs, i;
+		    rows, inputs, i;
 		
 		while (colIdx) {
 			rows = (((--colIdx) < fixedCols) ? nodes[0] : nodes[1])[colIdx].children;
-			bgColor = (colIdx < fixedCols) ? fixedSelBgColor : selBgColor;
 			
 			i = toRemove.length;
-			while (i) { rows[toRemove[--i]].style.backgroundColor = ""; }
+			while (i) { removeClass(rows[toRemove[--i]], 'g_Selected'); }
 			
 			i = toSelect.length;
-			while (i) { rows[toSelect[--i]].style.backgroundColor = bgColor; }
+			while (i) { addClass(rows[toSelect[--i]], 'g_Selected'); }
 		}
 		if (this.options.showSelectionColumn) {
 			inputs = nodes[(!this.usesTouch) ? 0 : 1][0].getElementsByTagName("INPUT");
@@ -1058,6 +1046,18 @@
 	    slice = Array.prototype.slice, 
 	    msie = getIEVersion();
 	
+	var addClass, removeClass;
+	if ("classList" in document.createElement("a")) {
+	  addClass = function(elem, className) { elem.classList.add(className); };
+	  removeClass = function(elem, className) { elem.classList.remove(className); };
+	} else {
+	  addClass = function(elem, className) { elem.className += ' ' + className; };
+	  removeClass = function(elem, className) {
+	    var before = elem.className;
+	    var after = before.replace(RegExp('\\b' + className + '\\b'), '');
+	    if (before !== after) { elem.className = after; }
+	  };
+	}
 	// Expose:
 	window.Grid = Grid;
 	
