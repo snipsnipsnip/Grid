@@ -441,6 +441,7 @@
 			nodes = (i < fixedCols) ? fNodes : sNodes;
 			colWidth = Math.max((nodes[0][i] || {}).offsetWidth || 0, 
 			                    (nodes[1][i] || {}).offsetWidth || 0, 
+			                    this.options.minColumnWidth,
 			                    (nodes[2][i] || {}).offsetWidth || 0);
 			
 			this.columnWidths[i] = colWidth;
@@ -667,7 +668,7 @@
 		    newLeft = (xDif > 0) ? this.tmp.origLeft + xDif : this.tmp.origLeft - Math.abs(xDif);
 		
 		this.tmp.newWidth = newWidth;
-		if (this.tmp.lastLeft !== newLeft && newWidth > 15) {
+		if (this.tmp.lastLeft !== newLeft && newWidth > this.options.minColumnWidth) {
 			this.tmp.dragger.style.left = newLeft + "px";
 			this.tmp.lastLeft = newLeft;
 		}
