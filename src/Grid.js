@@ -57,6 +57,9 @@
 			wheelSpeed : 33,
 			colAlign : [], // "left", "center", "right"
 			colSortTypes : [], // "string", "number", "date", "custom", "none"
+			minColumnWidth: 15,
+			minGridWidth: 60,
+			minGridHeight: 30,
 			customSortCleaner : null
 		};
 		
@@ -434,6 +437,7 @@
 			nodes = (i < fixedCols) ? fNodes : sNodes;
 			colWidth = Math.max((nodes[0][i] || {}).offsetWidth || 0, 
 			                    (nodes[1][i] || {}).offsetWidth || 0, 
+			                    this.options.minColumnWidth,
 			                    (nodes[2][i] || {}).offsetWidth || 0);
 			
 			this.columnWidths[i] = colWidth;
@@ -581,8 +585,8 @@
 			pagePos = getEventPositions(event || window.event, "page");
 			xDif = pagePos.x - this.tmp.origX;
 			yDif = pagePos.y - this.tmp.origY;
-			newWidth = Math.max(60, (xDif > 0) ? this.tmp.origWidth + xDif : this.tmp.origWidth - Math.abs(xDif));
-			newHeight = Math.max(30, (yDif > 0) ? this.tmp.origHeight + yDif : this.tmp.origHeight - Math.abs(yDif));
+			newWidth = Math.max(this.options.minGridWidth, (xDif > 0) ? this.tmp.origWidth + xDif : this.tmp.origWidth - Math.abs(xDif));
+			newHeight = Math.max(this.options.minGridHeight, (yDif > 0) ? this.tmp.origHeight + yDif : this.tmp.origHeight - Math.abs(yDif));
 			
 			elemStyle = this.element.style;
 			elemStyle.width = newWidth + "px";
@@ -652,11 +656,11 @@
 	GridProto.resizeColumn = function(event) {
 		var clientX = getEventPositions(event || window.event, "client").x, 
 		    xDif = clientX - this.tmp.origX, 
-		    newWidth = Math.max(15, (xDif > 0) ? this.tmp.origWidth + xDif : this.tmp.origWidth - Math.abs(xDif)), 
+		    newWidth = Math.max(this.options.minColumnWidth, (xDif > 0) ? this.tmp.origWidth + xDif : this.tmp.origWidth - Math.abs(xDif)),
 		    newLeft = (xDif > 0) ? this.tmp.origLeft + xDif : this.tmp.origLeft - Math.abs(xDif);
 		
 		this.tmp.newWidth = newWidth;
-		if (this.tmp.lastLeft !== newLeft && newWidth > 15) {
+		if (this.tmp.lastLeft !== newLeft && newWidth > this.options.minColumnWidth) {
 			this.tmp.dragger.style.left = newLeft + "px";
 			this.tmp.lastLeft = newLeft;
 		}

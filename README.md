@@ -180,6 +180,22 @@ Default is `null`.
 Integer. Multiplier of delta-Y on mouse wheel emulation (otherwise the fixed columns can't be scrolled).
 Default is `33`.
 
+**minColumnWidth**
+
+Integer. Width of any column will not be less than this number on resize.
+`allowColumnResize` must be `true` for this option to be used.
+Default is `15`.
+
+**minGridWidth**
+
+Integer. Width of the grid will not be less than this number on resize.
+`allowGridResize` must be `true` for this option to be used.
+Default is `60`.
+
+**minGridHeight**
+Integer. Height of the grid will not be less than this number on resize.
+`allowGridResize` must be `true` for this option to be used.
+Default is `30`.
 
 Future Features
 ---------------
