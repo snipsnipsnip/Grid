@@ -433,9 +433,9 @@
 	
 	//////////////////////////////////////////////////////////////////////////////////
 	GridProto.alignColumns = function(reAlign, fromInit) {
-		var sNodes = [this.headStatic.children || [], this.bodyStatic.children || [], this.footStatic.children || []], 
-		    fNodes = [this.headFixed.children || [], this.bodyFixed2.children || [], this.footFixed.children || []], 
-		    allowColumnResize = this.options.allowColumnResize, 
+		var sNodes = [this.headStatic.children && this.headStatic.children[1].children || [], this.bodyStatic.children || [], this.footFixed.children && this.footFixed.children[0].children || []],
+		    fNodes = [this.headFixed.children && this.headFixed.children[1].children || [], this.bodyFixed2.children || [], this.footFixed.children && this.footFixed.children[0].children || []],
+		    allowColumnResize = this.options.allowColumnResize,
 		    colAlign = this.options.colAlign, 
 		    fixedCols = this.options.fixedCols, 
 		    rules = this.css.rules, 
@@ -459,7 +459,6 @@
 			                    (nodes[1][i] || {}).offsetWidth || 0, 
 			                    this.options.minColumnWidth,
 			                    (nodes[2][i] || {}).offsetWidth || 0);
-			
 			this.columnWidths[i] = colWidth;
 			rules[".g_Cl" + i] = { "width" : colWidth + "px", "text-align" : (colAlign[i] || "left") };
 			if (allowColumnResize) {
@@ -1102,15 +1101,11 @@
 	  };
 	}
 
-  var elementFromString = ('createRange' in document && 'createContextualFragment' in Range.prototype) ?
-    function(str) {
-      return document.createRange().createContextualFragment(str);
-    } :
-    function(str) {
-      var tmp = document.createElement('div');
-      tmp.innerHTML = str;
-      return tmp;
-    };
+  function elementFromString(str) {
+    var tmp = document.createElement('div');
+    tmp.innerHTML = str;
+    return tmp;
+  }
 
   Grid.ColumnGroup = function(optionSpec, numColumns, fixedCols, isShowSelectionColumn) {
     this.spec = this.expandSpec(isShowSelectionColumn ? numColumns - 1 : numColumns, optionSpec);
