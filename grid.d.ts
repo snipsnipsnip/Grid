@@ -1,0 +1,86 @@
+/**
+ * // Grid
+ * // MIT-style license. Copyright 2012 Matt V. Murphy
+ */
+declare class Grid {
+    element: any;
+    css: any;
+    columns: any;
+    columnWidths: any;
+    cellData: any;
+    alignTimer: any;
+    rawData: any;
+    sortCache: any;
+    lastSortedColumn: any;
+    selectedIndexes: any;
+    startEvt: any;
+    moveEvt: any;
+    endEvt: any;
+    usesTouch: any;
+    options: any;
+    base: any;
+    baseResize: any;
+    body: any;
+    bodyFixed: any;
+    bodyFixed2: any;
+    bodyStatic: any;
+    docFrag: any;
+    foot: any;
+    footFixed: any;
+    footStatic: any;
+    hasBody: any;
+    hasFixedCols: any;
+    hasFoot: any;
+    hasHead: any;
+    hasHeadOrFoot: any;
+    head: any;
+    headFixed: any;
+    headStatic: any;
+    lastScrollLeft: any;
+    lastScrollTop: any;
+    parentDimensions: any;
+    tmp: any;
+    constructor(element: any, options: any);
+    nothing(): void;
+    setOptions(options: any): void;
+    init(): void;
+    generateSkeleton(): void;
+    addEvents(): void;
+    convertDomDataToJsonData(data: any): {};
+    convertXmlDataToJsonData(data: any): {};
+    convertData(data: any): void;
+    convertDataItem(arr: any, rows: any, rowClass: any, cols: any, allowColResize: any): void;
+    addSelectionColumn(data: any): void;
+    generateGrid(): void;
+    generateGridHead(): void;
+    generateGridBody(): void;
+    generateGridFoot(): void;
+    generateGridSection(cols: any): {
+        fixedHTML: string;
+        fullHTML: string;
+    };
+    displayGrid(): void;
+    alignColumns(reAlign: any, fromInit: any): void;
+    computeBaseStyles(): void;
+    syncScrolls(): void;
+    simulateMouseScroll(event: any): void;
+    setRules(): void;
+    initResizeGrid(event: any): boolean;
+    resizeGrid(event: any): void;
+    endResizeGrid(event: any): void;
+    delegateHeaderEvent(event: any): boolean;
+    initResizeColumn(event: any, target: any, targetClass: any): boolean;
+    resizeColumn(event: any): void;
+    endResizeColumn(event: any): void;
+    sortColumn(colIdx: any, sortAsc: any): void;
+    sortRawData(colIdx: any, colSortAs: any, sortAsc: any): void;
+    getSortResult(type: any, colIdx: any, ltVal: any, gtVal: any, a: any, b: any): any;
+    toggleSelectAll(toggle: any): void;
+    selectIndexes(rowIndexes: any): void;
+    selectRange(event: any): void;
+    updateSelectedIndexes(rowIdx: any, ctrlPressed: any, shiftPressed: any): void;
+    highlightRows(toSelect: any, toRemove: any): void;
+    preventSelectionInputStateChange(event: any): void;
+    cleanUp(): any;
+}
+export default Grid;
