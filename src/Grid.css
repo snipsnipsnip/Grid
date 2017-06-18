@@ -75,7 +75,6 @@
 	/* Base header fixed container if fixedCols > 0 */
 	position : absolute;
 	z-index : 3;
-	top : 0px;
 	left : 0px;
 	overflow : hidden;
 }
@@ -138,6 +137,7 @@
 .g_BR {
 	/* Grid body cell */
 	border-width : 0px 0px 1px 0px;
+	background-color: white;
 }
 .g_FR {
 	/* Grid footer cell */
@@ -180,6 +180,10 @@
 }
 .g_Rd {
 	margin-top : -2px;
+}
+.g_Groups {
+	/* Group headers and footers */
+	text-align: center;
 }
 @media print {
 	/* Print overrides */

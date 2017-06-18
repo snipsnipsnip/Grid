@@ -27,7 +27,9 @@
 			this.init();
 		}
 	};
-	
+
+	Grid.ColumnGroup = {};
+
 	//////////////////////////////////////////////////////////////////////////////////
 	(GridProto = Grid.prototype).nothing = function(){};
 	
@@ -60,6 +62,8 @@
 			minColumnWidth: 15,
 			minGridWidth: 60,
 			minGridHeight: 30,
+			headerGroups: null,
+			footerGroups: null,
 			customSortCleaner : null
 		};
 		
@@ -110,14 +114,18 @@
 		             ["head", "g_Head", "base"], 
 		             ["headFixed", "g_HeadFixed", "head"], 
 		             ["headStatic", "g_HeadStatic", "head"], 
+		             ["headFixedGroups", "g_Groups", "headFixed"],
+		             ["headStaticGroups", "g_Groups", "headStatic"],
 		             ["foot", "g_Foot", "base"], 
 		             ["footFixed", "g_FootFixed", "foot"], 
 		             ["footStatic", "g_FootStatic", "foot"], 
+		             ["footFixedGroups", "g_Groups", "footFixed"],
+		             ["footStaticGroups", "g_Groups", "footStatic"],
 		             ["body", "g_Body", "base"], 
 		             ["bodyFixed", "g_BodyFixed", "body"], 
 		             ["bodyFixed2", "g_BodyFixed2", "bodyFixed"], 
 		             ["bodyStatic", "g_BodyStatic", "body"]];
-		
+
 		this.parentDimensions = { x : this.element.offsetWidth, y : this.element.offsetHeight };
 		this.docFrag = doc.createDocumentFragment();
 		for (var i=0, elem; elem=elems[i]; i++) {
@@ -322,9 +330,15 @@
 		
 		if (this.hasHead) {
 			hHTML = this.generateGridSection(this.cellData.head);
-			this.headStatic.innerHTML = hHTML.fullHTML;
+
+			this.headStatic.appendChild(elementFromString(hHTML.fullHTML));
 			if (this.hasFixedCols) {
-				this.headFixed.innerHTML = hHTML.fixedHTML;
+				this.headFixed.appendChild(elementFromString(hHTML.fixedHTML));
+			}
+
+			if (this.options.headerGroups) {
+				this.headerGroup = new Grid.ColumnGroup(this.options.headerGroups, this.columns, this.options.fixedCols, this.options.showSelectionColumn);
+				this.headerGroup.writeHTML(this.headStaticGroups, this.hasFixedCols && this.headFixedGroups, 'g_Cl g_HeadGroupColumn', 'g_C g_HR');
 			}
 		}
 	};
@@ -350,9 +364,15 @@
 		
 		if (this.hasFoot) {
 			fHTML = this.generateGridSection(this.cellData.foot);
-			this.footStatic.innerHTML = fHTML.fullHTML;
+
+			this.footStatic.insertBefore(elementFromString(fHTML.fullHTML), this.footStaticGroups);
 			if (this.hasFixedCols) {
-				this.footFixed.innerHTML = fHTML.fixedHTML;
+				this.footFixed.insertBefore(elementFromString(fHTML.fixedHTML), this.footFixedGroups);
+			}
+
+			if (this.options.footerGroups) {
+				this.footerGroup = new Grid.ColumnGroup(this.options.footerGroups, this.columns, this.options.fixedCols, this.options.showSelectionColumn);
+				this.footerGroup.writeHTML(this.footStaticGroups, this.hasFixedCols && this.footFixedGroups, 'g_Cl g_FootGroupColumn', 'g_C g_FR');
 			}
 		}
 	};
@@ -446,12 +466,27 @@
 				rules[".g_RS" + i] = { "margin-left" : (colWidth - 2) + "px" };
 			}
 		}
+
+		this.alignGroupColumns();
+
 		this.setRules();
 		if (fromInit === true) {
 			this.options.onLoad.call(this);
 		}
 	};
-	
+
+  /**
+   * initializes grouping columns for the header and the footer.
+   */
+  GridProto.alignGroupColumns = function() {
+    if (this.hasHead && this.options.headerGroups) {
+      this.headerGroup.writeRules(this.css.rules, ".g_HeadGroupColumn", this.columnWidths);
+    }
+    if (this.hasFoot && this.options.footerGroups) {
+      this.footerGroup.writeRules(this.css.rules, ".g_FootGroupColumn", this.columnWidths);
+    }
+  }
+
 	//////////////////////////////////////////////////////////////////////////////////
 	GridProto.computeBaseStyles = function() {
 		var rules = this.css.rules, 
@@ -621,7 +656,10 @@
 					targetClass = (target = target.parentNode).className || "";
 				}
 				if (targetClass.indexOf("g_Cl") > -1) {
-					this.sortColumn(parseInt(/g_Cl(\d+)/.exec(targetClass)[1], 10));
+					var match = /g_Cl(\d+)/.exec(targetClass);
+					if (match) {
+						this.sortColumn(parseInt(match[1], 10));
+					}
 				}
 			}
 		}
@@ -681,6 +719,7 @@
 		this.css.rules[".g_Cl" + colIdx]["width"] = newWidth + "px";
 		this.css.rules[".g_RS" + colIdx]["margin-left"] = (newWidth - 2) + "px";
 		this.columnWidths[colIdx] = newWidth;
+		this.alignGroupColumns();
 		this.setRules();
 		this.syncScrolls();
 		this.options.onResizeColumnEnd.apply(this, [colIdx, newWidth]);
@@ -1062,6 +1101,153 @@
 	    if (before !== after) { elem.className = after; }
 	  };
 	}
+
+  var elementFromString = ('createRange' in document && 'createContextualFragment' in Range.prototype) ?
+    function(str) {
+      return document.createRange().createContextualFragment(str);
+    } :
+    function(str) {
+      var tmp = document.createElement('div');
+      tmp.innerHTML = str;
+      return tmp;
+    };
+
+  Grid.ColumnGroup = function(optionSpec, numColumns, fixedCols, isShowSelectionColumn) {
+    this.spec = this.expandSpec(isShowSelectionColumn ? numColumns - 1 : numColumns, optionSpec);
+    this.fixedCols = fixedCols;
+
+    if (isShowSelectionColumn) {
+      this.spec.unshift(null, 1);
+    }
+
+    this.ensureNotTorn();
+  }
+
+  Grid.ColumnGroup.prototype.writeHTML = function(staticDivElem, fixedDivElem, columnClassPrefix, cellClass) {
+    var full = [];
+    var fixed = fixedDivElem && [];
+
+    var column = 0;
+    var n = this.spec.length / 2;
+    for (var i = 0; i < n; i++) {
+      var caption = this.spec[i * 2] || "&nbsp;";
+      var len = this.spec[i * 2 + 1];
+
+      column += len;
+
+      if (column <= this.fixedCols) {
+        full.push("<div class='", columnClassPrefix, i, "'>");
+        full.push("</div>");
+
+        if (fixed) {
+          fixed.push("<div class='", columnClassPrefix, i, "'>")
+          fixed.push("<div class='", cellClass, "'>", caption, "</div>");
+          fixed.push("</div>");
+        }
+      } else {
+        full.push("<div class='", columnClassPrefix, i, "'>");
+        full.push("<div class='", cellClass, "'>", caption, "</div>");
+        full.push("</div>");
+      }
+    }
+
+    staticDivElem.innerHTML = full.join("");
+
+    if (fixed) {
+      fixedDivElem.innerHTML = fixed.join("");
+    }
+  }
+
+  Grid.ColumnGroup.prototype.ensureNotTorn = function() {
+    if (this.isTorn(this.fixedCols, this.spec)) {
+      throw new Error("Sorry, grouping across fixed and non-fixed column is not implemented");
+    }
+  }
+
+  Grid.ColumnGroup.prototype.isTorn = function(fixedCols, spec) {
+    var column = 0;
+    var n = spec.length / 2;
+    for (var i = 0; i < n; i++) {
+      var len = spec[i * 2 + 1];
+      if (column < fixedCols && fixedCols < column + len) {
+        if (spec[i * 2] !== null) {
+          return true;
+        }
+        break;
+      }
+      column += len;
+    }
+
+    return false;
+  }
+
+  Grid.ColumnGroup.prototype.writeRules = function(rules, prefix, columnWidths) {
+    var widths = this.calcWidths(columnWidths, this.spec);
+    for (var i = 0; i < widths.length; i++) {
+      rules[prefix + i] = {"width" : widths[i] + "px"};
+    }
+  }
+
+  Grid.ColumnGroup.prototype.expandSpec = function(numColumns, spec) {
+    spec.sort(compareSpecItem);
+
+    if (spec.length > 0 && numColumns <= spec[spec.length - 1].to) {
+      console.warn("not enough columns for the group spec", numColumns, spec[spec.length - 1].to);
+      throw new Error();
+    }
+
+    var widths = [];
+    var lastColumn = -1;
+    for (var i = 0; i < spec.length; i++) {
+      var group = spec[i];
+      var independents = group.from - lastColumn - 1;
+
+      if (group.from > group.to) {
+        console.warn("reversed range found", group);
+        throw new Error();
+      }
+
+      if (independents > 0) {
+        widths.push(null, independents);
+      }
+
+      widths.push(group.name, group.to - group.from + 1);
+      lastColumn = group.to;
+    }
+
+    if (numColumns - 1 !== lastColumn) {
+      widths.push(null, numColumns - 1 - lastColumn);
+    }
+
+    return widths;
+
+    function compareSpecItem(a, b) {
+      if (a.from <= b.from && b.from <= a.to || a.from <= b.to && b.to <= a.to) {
+        console.warn("overlapping range found", a, b);
+        throw new Error();
+      }
+      return a.from - b.from;
+    }
+  };
+
+  /**
+   * calculates widths of the grouping columns from column widths to be grouped.
+   * @param columnWidths : Array<Number> pixel width of each column in the grid.
+   * @param grouping : Array<Number | String | null> see {#expandSpec}.
+   */
+  Grid.ColumnGroup.prototype.calcWidths = function(columnWidths, grouping) {
+    var groupingWidths = Array(grouping.length / 2);
+    var column = 0;
+    for (var i = 0; i < groupingWidths.length; i++) {
+      groupingWidths[i] = 0;
+
+      for (var end = column + grouping[i * 2 + 1]; column < end; column++) {
+        groupingWidths[i] += columnWidths[column];
+      }
+    }
+    return groupingWidths;
+  };
+
 	// Expose:
 	window.Grid = Grid;
 	

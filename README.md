@@ -197,6 +197,18 @@ Integer. Height of the grid will not be less than this number on resize.
 `allowGridResize` must be `true` for this option to be used.
 Default is `30`.
 
+**wheelSpeed**
+Integer. Multiplier of delta-Y on mouse wheel emulation (otherwise the fixed columns can't be scrolled).
+Default is `33`.
+
+**headerGroups**
+Array<{from: Integer, to: Integer, name: String}>. Adds captions to groups of columns in the header.
+Default is `null`.
+
+**footerGroups**
+Array<{from: Integer, to: Integer, name: String}>. Adds captions to groups of columns in the footer.
+Default is `null`.
+
 Future Features
 ---------------
 
